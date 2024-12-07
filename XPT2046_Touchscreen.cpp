@@ -22,7 +22,7 @@
 
 #include "XPT2046_Touchscreen.h"
 
-#define Z_THRESHOLD     300
+#define Z_THRESHOLD     400
 #define Z_THRESHOLD_INT	75
 #define MSEC_THRESHOLD  3
 #define SPI_SETTING     SPISettings(2000000, MSBFIRST, SPI_MODE0)
@@ -30,7 +30,7 @@
 static XPT2046_Touchscreen 	*isrPinptr;
 void isrPin(void);
 
-bool XPT2046_Touchscreen::begin(SPIClass &wspi)
+bool XPT2046_Touchscreen::begin(SoftSPI &wspi)
 {
 	_pspi = &wspi;
 	_pspi->begin();
@@ -125,7 +125,6 @@ void XPT2046_Touchscreen::update()
 	uint32_t now = millis();
 	if (now - msraw < MSEC_THRESHOLD) return;
 	if (_pspi) {
-		_pspi->beginTransaction(SPI_SETTING);
 		digitalWrite(csPin, LOW);
 		_pspi->transfer(0xB1 /* Z1 */);
 		int16_t z1 = _pspi->transfer16(0xC1 /* Z2 */) >> 3;
@@ -143,7 +142,6 @@ void XPT2046_Touchscreen::update()
 		data[4] = _pspi->transfer16(0xD0 /* Y */) >> 3;	// Last Y touch power down
 		data[5] = _pspi->transfer16(0) >> 3;
 		digitalWrite(csPin, HIGH);
-		_pspi->endTransaction();
 	}	
 #if defined(_FLEXIO_SPI_H_)
 	else if (_pflexspi) {

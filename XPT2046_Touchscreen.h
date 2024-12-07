@@ -25,6 +25,7 @@
 
 #include "Arduino.h"
 #include <SPI.h>
+#include <SoftSPI.h>
 
 #if defined(__IMXRT1062__)
 #if __has_include(<FlexIOSPI.h>)
@@ -49,7 +50,7 @@ class XPT2046_Touchscreen {
 public:
 	constexpr XPT2046_Touchscreen(uint8_t cspin, uint8_t tirq=255)
 		: csPin(cspin), tirqPin(tirq) { }
-	bool begin(SPIClass &wspi = SPI);
+	bool begin(SoftSPI  &wspi);
 #if defined(_FLEXIO_SPI_H_)
 	bool begin(FlexIOSPI &wflexspi);
 #endif
@@ -69,7 +70,7 @@ private:
 	uint8_t csPin, tirqPin, rotation=1;
 	int16_t xraw=0, yraw=0, zraw=0;
 	uint32_t msraw=0x80000000;
-	SPIClass *_pspi = nullptr;
+	SoftSPI *_pspi = nullptr;
 #if defined(_FLEXIO_SPI_H_)
 	FlexIOSPI *_pflexspi = nullptr;
 #endif
